@@ -19,6 +19,8 @@ import AdminHome from "../pages/dashboard/admin/AdminHome";
 import AdminApplications from "../pages/dashboard/admin/AdminApplications";
 import AdminRoute from "../components/AdminRoute";
 import AdminManageUsers from "../pages/dashboard/admin/AdminManageUsers";
+import About from "../pages/About";
+import Contact from "../pages/Contact";
 
 const Router = createBrowserRouter([
   // Pages with MainLayout (carousel)
@@ -34,7 +36,14 @@ const Router = createBrowserRouter([
         path: "/loans",
         element: <AllLoansPage />,
       },
-
+      {
+        path: "/about",
+        element: <About></About>,
+      },
+      {
+        path: "/contact",
+        element: <Contact></Contact>,
+      },
       {
         path: "/loans/:loanId",
         element: (
