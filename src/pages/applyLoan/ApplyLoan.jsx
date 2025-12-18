@@ -205,10 +205,6 @@ const ApplyLoan = () => {
             >
               {isSubmitting ? "Submitting..." : "Submit Loan Application"}
             </button>
-
-            <p className="text-xs text-gray-500 text-center mt-3">
-              Application status will be <strong>Pending</strong> until review
-            </p>
           </div>
         </form>
       </div>
