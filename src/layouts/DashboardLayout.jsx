@@ -13,7 +13,7 @@ const DashboardLayout = () => {
         <DashboardSidebar />
 
         {/* Main Content */}
-        <div className="flex-1 bg-gray-100 p-6">
+        <div className="flex-1 bg-gray-100 p-6 mt-14">
           <Outlet />
         </div>
       </div>

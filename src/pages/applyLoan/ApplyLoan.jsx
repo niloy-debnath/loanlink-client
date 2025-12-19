@@ -58,6 +58,7 @@ const ApplyLoan = () => {
       ...data,
       loanId,
       loanTitle: loan.title,
+      loanCategory: loan.category,
       interestRate: loan.interest,
       userEmail: user.email,
       status: "Pending",
@@ -113,6 +114,7 @@ const ApplyLoan = () => {
 
             <div className="grid md:grid-cols-3 gap-4">
               <Input label="Email" value={user.email} readOnly />
+              <Input label="Category" value={loan.category} readOnly />
               <Input label="Loan Title" value={loan.title} readOnly />
               <Input
                 label="Interest Rate"

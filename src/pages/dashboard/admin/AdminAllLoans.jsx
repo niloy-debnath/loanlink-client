@@ -1,0 +1,248 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
+import Swal from "sweetalert2";
+
+const AdminAllLoans = () => {
+  const [loans, setLoans] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [editLoan, setEditLoan] = useState(null);
+
+  useEffect(() => {
+    fetchLoans();
+  }, []);
+
+  const fetchLoans = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get("http://localhost:5000/loans");
+      setLoans(res.data);
+    } catch (err) {
+      console.error("Failed to fetch loans:", err);
+      Swal.fire("Error", "Failed to fetch loans", "error");
+    }
+    setLoading(false);
+  };
+
+  const toggleShowOnHome = async (loan) => {
+    try {
+      await axios.put(`http://localhost:5000/loans/${loan._id}`, {
+        showOnHome: !loan.showOnHome,
+      });
+      fetchLoans();
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Failed to update visibility", "error");
+    }
+  };
+
+  const deleteLoan = async (id) => {
+    const confirm = await Swal.fire({
+      title: "Are you sure?",
+      text: "This loan will be permanently deleted",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete",
+    });
+
+    if (confirm.isConfirmed) {
+      try {
+        await axios.delete(`http://localhost:5000/loans/${id}`);
+        Swal.fire("Deleted", "Loan deleted successfully", "success");
+        fetchLoans();
+      } catch (err) {
+        console.error(err);
+        Swal.fire("Error", "Failed to delete loan", "error");
+      }
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      const payload = {
+        title: editLoan.title,
+        shortDesc: editLoan.shortDesc,
+        category: editLoan.category,
+        image: editLoan.image,
+        showOnHome: Boolean(editLoan.showOnHome),
+
+        interest: Number(editLoan.interest),
+        interestRate: Number(editLoan.interest), // keep in sync
+        maxLimit: Number(editLoan.maxLimit),
+
+        // must be ARRAY
+        emiPlans: Array.isArray(editLoan.emiPlans)
+          ? editLoan.emiPlans
+          : editLoan.emiPlans
+          ? editLoan.emiPlans.split(",").map((p) => p.trim())
+          : [],
+      };
+
+      await axios.put(`http://localhost:5000/loans/${editLoan._id}`, payload);
+
+      Swal.fire("Updated", "Loan updated globally", "success");
+      setEditLoan(null);
+      fetchLoans(); // reload from MongoDB
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Database update failed", "error");
+    }
+  };
+
+  if (loading) return <div>Loading...</div>;
+
+  return (
+    <div className="p-5">
+      <h1 className="text-2xl font-bold mb-5">All Loans</h1>
+
+      <div className="overflow-x-auto">
+        <table className="min-w-full border">
+          <thead className="bg-[#162660] text-white">
+            <tr>
+              <th>Image</th>
+              <th>Title</th>
+              <th>Interest</th>
+              <th>Category</th>
+              <th>Created By</th>
+              <th>Show on Home</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {loans.map((loan) => (
+              <tr key={loan._id} className="border-t text-center">
+                <td>
+                  <img
+                    src={loan.image}
+                    alt=""
+                    className="w-16 h-12 object-cover mx-auto"
+                  />
+                </td>
+                <td>{loan.title}</td>
+                <td>{loan.interest}%</td>
+                <td>{loan.category}</td>
+                <td>{loan.createdBy || "Admin"}</td>
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={loan.showOnHome || false}
+                    onChange={() => toggleShowOnHome(loan)}
+                  />
+                </td>
+                <td className="space-x-2">
+                  <button
+                    onClick={() => setEditLoan(loan)}
+                    className="bg-blue-500 text-white px-2 py-1 rounded"
+                  >
+                    Update
+                  </button>
+                  <button
+                    onClick={() => deleteLoan(loan._id)}
+                    className="bg-red-500 text-white px-2 py-1 rounded"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* EDIT MODAL */}
+      {editLoan && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded w-96 max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-bold mb-4">Edit Loan</h2>
+
+            <input
+              value={editLoan.title}
+              onChange={(e) =>
+                setEditLoan({ ...editLoan, title: e.target.value })
+              }
+              className="w-full border p-2 mb-2"
+              placeholder="Title"
+            />
+
+            <textarea
+              value={editLoan.shortDesc || ""}
+              onChange={(e) =>
+                setEditLoan({ ...editLoan, shortDesc: e.target.value })
+              }
+              className="w-full border p-2 mb-2"
+              placeholder="Short Description"
+              rows={3}
+            />
+
+            <input
+              type="number"
+              value={editLoan.interest || ""}
+              onChange={(e) =>
+                setEditLoan({ ...editLoan, interest: e.target.value })
+              }
+              className="w-full border p-2 mb-2"
+              placeholder="Interest Rate (%)"
+            />
+
+            <input
+              value={editLoan.category || ""}
+              onChange={(e) =>
+                setEditLoan({ ...editLoan, category: e.target.value })
+              }
+              className="w-full border p-2 mb-2"
+              placeholder="Category"
+            />
+
+            <input
+              value={editLoan.image || ""}
+              onChange={(e) =>
+                setEditLoan({ ...editLoan, image: e.target.value })
+              }
+              className="w-full border p-2 mb-2"
+              placeholder="Image URL"
+            />
+
+            <input
+              type="number"
+              value={editLoan.maxLimit || ""}
+              onChange={(e) =>
+                setEditLoan({ ...editLoan, maxLimit: e.target.value })
+              }
+              className="w-full border p-2 mb-2"
+              placeholder="Max Loan Limit"
+            />
+
+            <input
+              value={editLoan.emiPlans?.join(", ") || ""}
+              onChange={(e) =>
+                setEditLoan({
+                  ...editLoan,
+                  emiPlans: e.target.value.split(",").map((p) => p.trim()),
+                })
+              }
+              className="w-full border p-2 mb-2"
+              placeholder="EMI Plans (6 Months, 12 Months, 24 Months)"
+            />
+
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                onClick={() => setEditLoan(null)}
+                className="px-3 py-1 border rounded"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                className="px-3 py-1 bg-green-500 text-white rounded"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default AdminAllLoans;

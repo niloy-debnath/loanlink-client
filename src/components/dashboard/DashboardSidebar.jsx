@@ -26,16 +26,31 @@ const DashboardSidebar = () => {
 
         {/* -------- Manager -------- */}
         {role === "manager" && (
-          <NavLink to="/dashboard/pending-loans" className={linkClass}>
-            Pending Loans
-          </NavLink>
+          <>
+            <NavLink to="/dashboard/add-loan" className={linkClass}>
+              Add Loan
+            </NavLink>
+            <NavLink to="/dashboard/manage-loans" className={linkClass}>
+              Manage Loans
+            </NavLink>
+            <NavLink to="/dashboard/pending-loans" className={linkClass}>
+              Pending Loans
+            </NavLink>
+
+            <NavLink to="/dashboard/approved-loans" className={linkClass}>
+              Approved Loans
+            </NavLink>
+            <NavLink to="/dashboard/profile" className={linkClass}>
+              My Profile
+            </NavLink>
+          </>
         )}
 
         {/* -------- Admin -------- */}
         {role === "admin" && (
           <>
-            <NavLink to="/dashboard/admin" className={linkClass}>
-              Admin Home
+            <NavLink to="/dashboard/admin/all-loans" className={linkClass}>
+              All Loans
             </NavLink>
 
             <NavLink to="/dashboard/admin/applications" className={linkClass}>

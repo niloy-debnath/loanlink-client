@@ -13,6 +13,10 @@ const DashboardHome = () => {
     );
   }
 
+  if (role === "admin") {
+    return <Navigate to="/dashboard/admin/applications" />;
+  }
+
   if (role === "manager") {
     return <Navigate to="/dashboard/pending-loans" />;
   }
@@ -21,12 +25,7 @@ const DashboardHome = () => {
     return <Navigate to="/dashboard/my-loans" />;
   }
 
-  // fallback (admin / unknown role)
-  return (
-    <div className="text-center mt-10">
-      <h1 className="text-2xl font-bold">Welcome to Dashboard</h1>
-    </div>
-  );
+  return null;
 };
 
 export default DashboardHome;

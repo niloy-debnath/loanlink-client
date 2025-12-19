@@ -31,6 +31,7 @@ const AdminApplications = () => {
   // Filter applications by status
   useEffect(() => {
     const filtered = applications.filter((app) => app.status === filter);
+    console.log(filtered);
     setFilteredApps(filtered);
   }, [applications, filter]);
 
@@ -81,6 +82,7 @@ const AdminApplications = () => {
               <tr>
                 <th className="px-4 py-2">Loan ID</th>
                 <th className="px-4 py-2">User</th>
+                <th className="px-4 py-2">Loan Category</th>
                 <th className="px-4 py-2">Amount</th>
                 <th className="px-4 py-2">Status</th>
                 <th className="px-4 py-2">Actions</th>
@@ -91,31 +93,35 @@ const AdminApplications = () => {
                 <tr key={app._id} className="text-center border-t">
                   <td className="px-4 py-2">{app._id}</td>
                   <td className="px-4 py-2">{app.userEmail}</td>
+                  <td className="px-4 py-2">{app.loanCategory}</td>
                   <td className="px-4 py-2">${app.loanAmount}</td>
                   <td className="px-4 py-2">{app.status}</td>
-                  <td className="px-4 py-2 space-x-2">
-                    <button
-                      onClick={() => setSelectedApp(app)}
-                      className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                    >
-                      View
-                    </button>
-                    {app.status === "Pending" && (
-                      <>
-                        <button
-                          onClick={() => updateStatus(app._id, "Approved")}
-                          className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-                        >
-                          Approve
-                        </button>
-                        <button
-                          onClick={() => updateStatus(app._id, "Rejected")}
-                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                        >
-                          Reject
-                        </button>
-                      </>
-                    )}
+                  <td className="px-4 py-2">
+                    <div className="flex justify-center items-center gap-2 whitespace-nowrap">
+                      <button
+                        onClick={() => setSelectedApp(app)}
+                        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                      >
+                        View
+                      </button>
+
+                      {app.status === "Pending" && (
+                        <>
+                          <button
+                            onClick={() => updateStatus(app._id, "Approved")}
+                            className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                          >
+                            Approve
+                          </button>
+                          <button
+                            onClick={() => updateStatus(app._id, "Rejected")}
+                            className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                          >
+                            Reject
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

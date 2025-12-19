@@ -9,7 +9,7 @@ const AvailableLoans = () => {
 
   useEffect(() => {
     axios
-      .get(`${import.meta.env.VITE_API_URL}/loans`)
+      .get(`${import.meta.env.VITE_API_URL}/loans/home`)
       .then((res) => setLoans(res.data))
       .catch((err) => console.log(err));
   }, []);
