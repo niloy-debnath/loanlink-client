@@ -25,6 +25,7 @@ import AddLoanManager from "../pages/dashboard/manager/AddLoanManager";
 import ManageLoans from "../pages/dashboard/manager/ManageLoans";
 import ApprovedApplicationsManager from "../pages/dashboard/manager/ApprovedApplicationsManager";
 import MyProfileManager from "../pages/dashboard/manager/MyProfileManager";
+import MyProfile from "../pages/MyProfile";
 
 const Router = createBrowserRouter([
   {
@@ -34,6 +35,7 @@ const Router = createBrowserRouter([
       { path: "/", element: <Home /> },
       { path: "/loans", element: <AllLoansPage /> },
       { path: "/about", element: <About /> },
+      { path: "/profile", element: <MyProfile></MyProfile> },
       { path: "/contact", element: <Contact /> },
       {
         path: "/loans/:loanId",
@@ -111,6 +113,14 @@ const Router = createBrowserRouter([
         element: (
           <BorrowerRoute>
             <MyLoans />
+          </BorrowerRoute>
+        ),
+      },
+      {
+        path: "profile",
+        element: (
+          <BorrowerRoute>
+            <MyProfile></MyProfile>
           </BorrowerRoute>
         ),
       },

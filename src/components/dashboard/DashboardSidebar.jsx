@@ -19,9 +19,14 @@ const DashboardSidebar = () => {
       <nav className="space-y-2">
         {/* -------- Borrower -------- */}
         {role === "borrower" && (
-          <NavLink to="/dashboard/my-loans" className={linkClass}>
-            My Loans
-          </NavLink>
+          <>
+            <NavLink to="/dashboard/my-loans" className={linkClass}>
+              My Loans
+            </NavLink>
+            <NavLink to="/dashboard/profile" className={linkClass}>
+              My Profile
+            </NavLink>
+          </>
         )}
 
         {/* -------- Manager -------- */}

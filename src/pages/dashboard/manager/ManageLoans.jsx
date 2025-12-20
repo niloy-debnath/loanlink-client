@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import useAuth from "../../../hooks/useAuth";
-import { Link } from "react-router";
 
 const ManageLoans = () => {
   const { user } = useAuth();
@@ -10,18 +9,25 @@ const ManageLoans = () => {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
+  /* ---------------- FETCH LOANS ---------------- */
   const fetchLoans = async () => {
-    setLoading(true);
-    const res = await axios.get(
-      `http://localhost:5000/loans/manager/${user.email}`
-    );
-    setLoans(res.data);
-    setLoading(false);
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `http://localhost:5000/loans/manager/${user.email}`
+      );
+      setLoans(res.data);
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Failed to load loans", "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchLoans();
-  }, []);
+    if (user?.email) fetchLoans();
+  }, [user]);
 
   /* ---------------- DELETE ---------------- */
   const handleDelete = async (id) => {
@@ -37,8 +43,63 @@ const ManageLoans = () => {
     if (!confirm.isConfirmed) return;
 
     await axios.delete(`http://localhost:5000/loans/${id}`);
-    Swal.fire("Deleted", "Loan removed", "success");
+    Swal.fire("Deleted", "Loan removed successfully", "success");
     fetchLoans();
+  };
+
+  /* ---------------- UPDATE (MODAL) ---------------- */
+  const handleEdit = async (loan) => {
+    const { value: formValues } = await Swal.fire({
+      title: "Update Loan",
+      html: `
+        <input id="title" class="swal2-input" placeholder="Title" value="${
+          loan.title
+        }" />
+        <input id="interestRate" type="number" class="swal2-input" placeholder="Interest Rate" value="${
+          loan.interestRate
+        }" />
+        <input id="category" class="swal2-input" placeholder="Category" value="${
+          loan.category
+        }" />
+        <input id="maxLimit" type="number" class="swal2-input" placeholder="Max Limit" value="${
+          loan.maxLimit
+        }" />
+        <input id="image" class="swal2-input" placeholder="Image URL" value="${
+          loan.image
+        }" />
+        <label style="display:flex;align-items:center;gap:8px;margin-top:10px">
+          <input id="showOnHome" type="checkbox" ${
+            loan.showOnHome ? "checked" : ""
+          } />
+          Show on Home
+        </label>
+      `,
+      focusConfirm: false,
+      preConfirm: () => {
+        return {
+          title: document.getElementById("title").value,
+          interestRate: document.getElementById("interestRate").value,
+          category: document.getElementById("category").value,
+          maxLimit: document.getElementById("maxLimit").value,
+          image: document.getElementById("image").value,
+          showOnHome: document.getElementById("showOnHome").checked,
+        };
+      },
+      showCancelButton: true,
+      confirmButtonText: "Update",
+    });
+
+    if (!formValues) return;
+
+    try {
+      await axios.put(`http://localhost:5000/loans/${loan._id}`, formValues);
+
+      Swal.fire("Updated", "Loan updated successfully", "success");
+      fetchLoans();
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Failed to update loan", "error");
+    }
   };
 
   /* ---------------- SEARCH ---------------- */
@@ -54,7 +115,6 @@ const ManageLoans = () => {
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4 text-[#162660]">Manage Loans</h1>
 
-      {/* SEARCH */}
       <input
         type="text"
         placeholder="Search by title or category"
@@ -89,12 +149,12 @@ const ManageLoans = () => {
                 <td className="p-2">{loan.interestRate}%</td>
                 <td className="p-2">{loan.category}</td>
                 <td className="p-2 space-x-2">
-                  <Link
-                    to={`/dashboard/update-loan/${loan._id}`}
+                  <button
+                    onClick={() => handleEdit(loan)}
                     className="bg-blue-500 text-white px-3 py-1 rounded"
                   >
-                    Update
-                  </Link>
+                    Edit
+                  </button>
                   <button
                     onClick={() => handleDelete(loan._id)}
                     className="bg-red-500 text-white px-3 py-1 rounded"
@@ -104,6 +164,7 @@ const ManageLoans = () => {
                 </td>
               </tr>
             ))}
+
             {filteredLoans.length === 0 && (
               <tr>
                 <td colSpan="5" className="p-4 text-center">

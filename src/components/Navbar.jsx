@@ -12,22 +12,50 @@ const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [theme, setTheme] = useState("light");
 
-  // Auth listener
+  /* ================= AUTH + USER SYNC ================= */
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (!currentUser) {
+        setUser(null);
+        return;
+      }
+
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/users/${currentUser.email}`
+        );
+        const dbUser = await res.json();
+
+        setUser({
+          uid: currentUser.uid,
+          email: currentUser.email,
+          displayName: dbUser.name || currentUser.displayName,
+          photoURL: dbUser.photoURL || null, // ✅ ONLY MongoDB
+          role: dbUser.role || null,
+        });
+      } catch (err) {
+        console.error("User sync failed:", err);
+        setUser({
+          uid: currentUser.uid,
+          email: currentUser.email,
+          displayName: currentUser.displayName,
+          photoURL: null,
+          role: null,
+        });
+      }
     });
+
     return () => unsubscribe();
   }, []);
 
-  // Logout
+  /* ================= LOGOUT ================= */
   const handleLogout = async () => {
     await signOut(auth);
-    setOpenDropdown(false);
     setUser(null);
+    setOpenDropdown(false);
   };
 
-  // Theme toggle
+  /* ================= THEME ================= */
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
@@ -41,22 +69,6 @@ const Navbar = () => {
         : "text-[#162660] hover:bg-[#162660] hover:text-[#F1E4D1]"
     }`;
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        // Fetch user role from backend
-        const res = await fetch(
-          `http://localhost:5000/users/${currentUser.email}`
-        );
-        const data = await res.json();
-        setUser({ ...currentUser, role: data.role }); // attach role
-      } else {
-        setUser(null);
-      }
-    });
-    return () => unsubscribe();
-  }, []);
-
   return (
     <div
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
@@ -69,7 +81,7 @@ const Navbar = () => {
         {/* Logo */}
         <Logo />
 
-        {/* Desktop Links */}
+        {/* Desktop Menu */}
         <ul className="hidden md:flex items-center gap-5">
           <NavLink to="/" className={navItemClass}>
             Home
@@ -94,64 +106,66 @@ const Navbar = () => {
               </NavLink>
             </>
           )}
+
           {user && (
-            <NavLink to="/dashboard" className={navItemClass}>
-              Dashboard
-            </NavLink>
+            <>
+              <NavLink to="/dashboard" className={navItemClass}>
+                Dashboard
+              </NavLink>
+
+              <li className="relative flex items-center gap-2">
+                <button
+                  onClick={() => setOpenDropdown(!openDropdown)}
+                  className="flex items-center gap-1.5 border rounded-full px-1.5 py-0.5 hover:bg-[#162660] hover:text-[#F1E4D1] transition"
+                >
+                  <img
+                    src={user.photoURL || cat}
+                    alt="User Avatar"
+                    className="w-7 h-7 rounded-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = cat;
+                    }}
+                  />
+                  <span className="hidden md:block text-sm font-medium">
+                    {user.displayName || "User"}
+                  </span>
+                </button>
+
+                {/* Role Badge */}
+                {user.role && (
+                  <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-600 text-white">
+                    {user.role.toUpperCase()}
+                  </span>
+                )}
+
+                {/* Dropdown */}
+                {openDropdown && (
+                  <ul className="absolute right-0 mt-2 w-40 bg-white text-[#162660] rounded-md shadow-lg border overflow-hidden z-50">
+                    <li>
+                      <NavLink
+                        to="/profile"
+                        className="block px-4 py-2 hover:bg-[#D0E6FD]"
+                        onClick={() => setOpenDropdown(false)}
+                      >
+                        Profile
+                      </NavLink>
+                    </li>
+                    <li>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 hover:bg-[#D0E6FD]"
+                      >
+                        Logout
+                      </button>
+                    </li>
+                  </ul>
+                )}
+              </li>
+            </>
           )}
-          {user && (
-            <li className="relative flex items-center gap-2">
-              <button
-                onClick={() => setOpenDropdown(!openDropdown)}
-                className="flex items-center gap-1.5 border rounded-full px-1.5 py-0.5 hover:bg-[#162660] hover:text-[#F1E4D1] transition"
-              >
-                <img
-                  src={user?.photoURL || cat}
-                  alt="User Avatar"
-                  className="w-7 h-7 rounded-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.onerror = null;
-                    e.currentTarget.src = cat;
-                  }}
-                />
-                <span className="hidden md:block text-sm font-medium">
-                  {user.displayName || "User"}
-                </span>
-              </button>
 
-              {/* Role Badge */}
-              {user.role && (
-                <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-500 text-white">
-                  {user.role.toUpperCase()}
-                </span>
-              )}
-
-              {/* Dropdown */}
-              {openDropdown && (
-                <ul className="absolute right-0 mt-2 w-40 bg-white text-[#162660] rounded-md shadow-lg border border-gray-200 overflow-hidden z-50">
-                  <li>
-                    <NavLink
-                      to="/profile"
-                      className="block px-4 py-2 hover:bg-[#D0E6FD]"
-                      onClick={() => setOpenDropdown(false)}
-                    >
-                      Profile
-                    </NavLink>
-                  </li>
-                  <li>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 hover:bg-[#D0E6FD]"
-                    >
-                      Logout
-                    </button>
-                  </li>
-                </ul>
-              )}
-            </li>
-          )}
-
-          {/* Theme toggle */}
+          {/* Theme */}
           <li>
             <button
               onClick={toggleTheme}
@@ -162,7 +176,7 @@ const Navbar = () => {
           </li>
         </ul>
 
-        {/* Mobile Hamburger */}
+        {/* Mobile Toggle */}
         <button
           className="md:hidden px-2 py-1 border rounded"
           onClick={() => setMobileOpen(!mobileOpen)}
@@ -177,17 +191,15 @@ const Navbar = () => {
           <NavLink to="/" className={navItemClass}>
             Home
           </NavLink>
+          <NavLink to="dashboard" className={navItemClass}>
+            Dashboard
+          </NavLink>
           <NavLink to="/loans" className={navItemClass}>
             All Loans
           </NavLink>
-          {!user && (
+
+          {!user ? (
             <>
-              <NavLink to="/about" className={navItemClass}>
-                About
-              </NavLink>
-              <NavLink to="/contact" className={navItemClass}>
-                Contact
-              </NavLink>
               <NavLink to="/login" className={navItemClass}>
                 Login
               </NavLink>
@@ -195,14 +207,9 @@ const Navbar = () => {
                 Register
               </NavLink>
             </>
-          )}
-          {user && (
+          ) : (
             <>
-              <NavLink
-                to="/profile"
-                className={navItemClass}
-                onClick={() => setMobileOpen(false)}
-              >
+              <NavLink to="/profile" className={navItemClass}>
                 Profile
               </NavLink>
               <button onClick={handleLogout} className={navItemClass}>
@@ -210,16 +217,8 @@ const Navbar = () => {
               </button>
             </>
           )}
-          <li>
-            <button onClick={toggleTheme} className={navItemClass}>
-              {theme === "light" ? <TbMoon /> : <TbSun />}
-            </button>
-          </li>
         </ul>
       )}
-
-      {/* Spacer */}
-      {/* <div className="h-14" /> */}
     </div>
   );
 };

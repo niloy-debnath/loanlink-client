@@ -57,6 +57,7 @@ const ApplyLoan = () => {
     const applicationData = {
       ...data,
       loanId,
+      name: loan.firstName,
       loanTitle: loan.title,
       loanCategory: loan.category,
       interestRate: loan.interest,
@@ -65,7 +66,7 @@ const ApplyLoan = () => {
       applicationFeeStatus: "unpaid",
       createdAt: new Date(),
     };
-
+    console.log(applicationData);
     try {
       await axios.post(
         `${import.meta.env.VITE_API_URL}/loan-applications`,
