@@ -26,7 +26,6 @@ const PendingLoans = () => {
     fetchLoans();
   }, []);
 
-  /* ---------- APPROVE / REJECT ---------- */
   const updateStatus = async (id, status) => {
     const confirm = await Swal.fire({
       title: `${status} Application?`,
@@ -49,7 +48,6 @@ const PendingLoans = () => {
     }
   };
 
-  /* ---------- VIEW MODAL ---------- */
   const handleView = (loan) => {
     Swal.fire({
       title: "Loan Application Details",
@@ -78,74 +76,123 @@ const PendingLoans = () => {
   }
 
   return (
-    <div className="p-6 bg-[#F1E4D1] min-h-[80vh]">
-      <h2 className="text-3xl font-bold mb-6 text-[#162660]">
+    <div className="p-4 sm:p-6  min-h-[80vh]">
+      <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-[#162660]">
         Pending Loan Applications
       </h2>
 
       {loans.length === 0 ? (
         <p className="text-gray-600">No pending loan applications.</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full table-auto bg-white rounded-xl shadow-lg">
-            <thead className="bg-[#162660] text-white">
-              <tr>
-                <th className="p-3">Loan ID</th>
-                <th className="p-3">User Info</th>
-                <th className="p-3">Amount</th>
-                <th className="p-3">Date</th>
-                <th className="p-3">Actions</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {loans.map((loan) => (
-                <tr key={loan._id} className="border-b hover:bg-gray-100">
-                  <td className="p-3 text-xs">{loan._id}</td>
-
-                  <td className="p-3">
-                    <p className="font-medium">
-                      {loan.firstName && loan.lastName
-                        ? `${loan.firstName} ${loan.lastName}`
-                        : "N/A"}
-                    </p>
-
-                    <p className="text-sm text-gray-600">{loan.userEmail}</p>
-                  </td>
-
-                  <td className="p-3">${loan.loanAmount}</td>
-
-                  <td className="p-3">
-                    {new Date(loan.createdAt).toLocaleDateString()}
-                  </td>
-
-                  <td className="p-3 flex gap-2">
-                    <button
-                      onClick={() => handleView(loan)}
-                      className="px-3 py-1 bg-blue-600 text-white rounded"
-                    >
-                      View
-                    </button>
-
-                    <button
-                      onClick={() => updateStatus(loan._id, "Approved")}
-                      className="px-3 py-1 bg-green-600 text-white rounded"
-                    >
-                      Approve
-                    </button>
-
-                    <button
-                      onClick={() => updateStatus(loan._id, "Rejected")}
-                      className="px-3 py-1 bg-red-600 text-white rounded"
-                    >
-                      Reject
-                    </button>
-                  </td>
+        <>
+          {/* ---------------- DESKTOP TABLE ---------------- */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full bg-white rounded-xl shadow-lg">
+              <thead className="bg-[#162660] text-white">
+                <tr>
+                  <th className="p-3">Loan ID</th>
+                  <th className="p-3">User Info</th>
+                  <th className="p-3">Amount</th>
+                  <th className="p-3">Date</th>
+                  <th className="p-3">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+
+              <tbody>
+                {loans.map((loan) => (
+                  <tr key={loan._id} className="border-b hover:bg-gray-100">
+                    <td className="p-3 text-xs break-all">{loan._id}</td>
+
+                    <td className="p-3">
+                      <p className="font-medium">
+                        {loan.firstName && loan.lastName
+                          ? `${loan.firstName} ${loan.lastName}`
+                          : "N/A"}
+                      </p>
+                      <p className="text-sm text-gray-600">{loan.userEmail}</p>
+                    </td>
+
+                    <td className="p-3">${loan.loanAmount}</td>
+
+                    <td className="p-3">
+                      {new Date(loan.createdAt).toLocaleDateString()}
+                    </td>
+
+                    <td className="p-3 flex gap-2">
+                      <button
+                        onClick={() => handleView(loan)}
+                        className="px-3 py-1 bg-blue-600 text-white rounded"
+                      >
+                        View
+                      </button>
+                      <button
+                        onClick={() => updateStatus(loan._id, "Approved")}
+                        className="px-3 py-1 bg-green-600 text-white rounded"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => updateStatus(loan._id, "Rejected")}
+                        className="px-3 py-1 bg-red-600 text-white rounded"
+                      >
+                        Reject
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* ---------------- MOBILE CARDS ---------------- */}
+          <div className="md:hidden space-y-4">
+            {loans.map((loan) => (
+              <div key={loan._id} className="bg-white rounded-xl shadow p-4">
+                <p className="text-xs text-gray-500 break-all">
+                  ID: {loan._id}
+                </p>
+
+                <p className="font-semibold mt-1">
+                  {loan.firstName && loan.lastName
+                    ? `${loan.firstName} ${loan.lastName}`
+                    : "N/A"}
+                </p>
+
+                <p className="text-sm text-gray-600">{loan.userEmail}</p>
+
+                <div className="mt-2 text-sm">
+                  <p>
+                    <b>Amount:</b> ${loan.loanAmount}
+                  </p>
+                  <p>
+                    <b>Date:</b> {new Date(loan.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <button
+                    onClick={() => handleView(loan)}
+                    className="px-3 py-1 bg-blue-600 text-white rounded text-sm"
+                  >
+                    View
+                  </button>
+                  <button
+                    onClick={() => updateStatus(loan._id, "Approved")}
+                    className="px-3 py-1 bg-green-600 text-white rounded text-sm"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => updateStatus(loan._id, "Rejected")}
+                    className="px-3 py-1 bg-red-600 text-white rounded text-sm"
+                  >
+                    Reject
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );
