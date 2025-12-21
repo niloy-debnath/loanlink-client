@@ -74,7 +74,7 @@ const AddLoanManager = () => {
   };
 
   return (
-    <div className="p-6 bg-[#F1E4D1] min-h-screen">
+    <div className="p-6  min-h-screen">
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-8">
         {/* Header */}
         <div className="mb-8 border-b pb-4">
