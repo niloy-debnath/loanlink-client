@@ -197,6 +197,12 @@ const Navbar = () => {
           <NavLink to="/loans" className={navItemClass}>
             All Loans
           </NavLink>
+          <NavLink to="/contact" className={navItemClass}>
+            Contact
+          </NavLink>
+          <NavLink to="/about" className={navItemClass}>
+            About
+          </NavLink>
 
           {!user ? (
             <>

@@ -160,11 +160,7 @@ const Router = createBrowserRouter([
       },
       {
         path: "profile",
-        element: (
-          <ManagerRoute>
-            <MyProfileManager></MyProfileManager>
-          </ManagerRoute>
-        ),
+        element: <MyProfileManager></MyProfileManager>,
       },
     ],
   },

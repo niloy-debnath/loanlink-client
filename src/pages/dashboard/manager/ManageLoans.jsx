@@ -9,7 +9,6 @@ const ManageLoans = () => {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
-  /* ---------------- FETCH LOANS ---------------- */
   const fetchLoans = async () => {
     try {
       setLoading(true);
@@ -17,8 +16,7 @@ const ManageLoans = () => {
         `http://localhost:5000/loans/manager/${user.email}`
       );
       setLoans(res.data);
-    } catch (err) {
-      console.error(err);
+    } catch {
       Swal.fire("Error", "Failed to load loans", "error");
     } finally {
       setLoading(false);
@@ -29,7 +27,6 @@ const ManageLoans = () => {
     if (user?.email) fetchLoans();
   }, [user]);
 
-  /* ---------------- DELETE ---------------- */
   const handleDelete = async (id) => {
     const confirm = await Swal.fire({
       title: "Delete Loan?",
@@ -47,62 +44,44 @@ const ManageLoans = () => {
     fetchLoans();
   };
 
-  /* ---------------- UPDATE (MODAL) ---------------- */
   const handleEdit = async (loan) => {
-    const { value: formValues } = await Swal.fire({
+    const { value } = await Swal.fire({
       title: "Update Loan",
       html: `
-        <input id="title" class="swal2-input" placeholder="Title" value="${
-          loan.title
-        }" />
-        <input id="interestRate" type="number" class="swal2-input" placeholder="Interest Rate" value="${
+        <input id="title" class="swal2-input" value="${loan.title}" />
+        <input id="interestRate" type="number" class="swal2-input" value="${
           loan.interestRate
         }" />
-        <input id="category" class="swal2-input" placeholder="Category" value="${
-          loan.category
-        }" />
-        <input id="maxLimit" type="number" class="swal2-input" placeholder="Max Limit" value="${
+        <input id="category" class="swal2-input" value="${loan.category}" />
+        <input id="maxLimit" type="number" class="swal2-input" value="${
           loan.maxLimit
         }" />
-        <input id="image" class="swal2-input" placeholder="Image URL" value="${
-          loan.image
-        }" />
-        <label style="display:flex;align-items:center;gap:8px;margin-top:10px">
+        <input id="image" class="swal2-input" value="${loan.image}" />
+        <label style="display:flex;gap:8px;margin-top:10px">
           <input id="showOnHome" type="checkbox" ${
             loan.showOnHome ? "checked" : ""
-          } />
+          }/>
           Show on Home
         </label>
       `,
-      focusConfirm: false,
-      preConfirm: () => {
-        return {
-          title: document.getElementById("title").value,
-          interestRate: document.getElementById("interestRate").value,
-          category: document.getElementById("category").value,
-          maxLimit: document.getElementById("maxLimit").value,
-          image: document.getElementById("image").value,
-          showOnHome: document.getElementById("showOnHome").checked,
-        };
-      },
+      preConfirm: () => ({
+        title: document.getElementById("title").value,
+        interestRate: document.getElementById("interestRate").value,
+        category: document.getElementById("category").value,
+        maxLimit: document.getElementById("maxLimit").value,
+        image: document.getElementById("image").value,
+        showOnHome: document.getElementById("showOnHome").checked,
+      }),
       showCancelButton: true,
-      confirmButtonText: "Update",
     });
 
-    if (!formValues) return;
+    if (!value) return;
 
-    try {
-      await axios.put(`http://localhost:5000/loans/${loan._id}`, formValues);
-
-      Swal.fire("Updated", "Loan updated successfully", "success");
-      fetchLoans();
-    } catch (err) {
-      console.error(err);
-      Swal.fire("Error", "Failed to update loan", "error");
-    }
+    await axios.put(`http://localhost:5000/loans/${loan._id}`, value);
+    Swal.fire("Updated", "Loan updated successfully", "success");
+    fetchLoans();
   };
 
-  /* ---------------- SEARCH ---------------- */
   const filteredLoans = loans.filter(
     (loan) =>
       loan.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -112,18 +91,19 @@ const ManageLoans = () => {
   if (loading) return <div className="p-6">Loading...</div>;
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <h1 className="text-2xl font-bold mb-4 text-[#162660]">Manage Loans</h1>
 
       <input
         type="text"
         placeholder="Search by title or category"
-        className="mb-4 w-full md:w-1/3 border px-4 py-2 rounded"
+        className="mb-4 w-full sm:w-2/3 md:w-1/3 border px-4 py-2 rounded"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
 
-      <div className="overflow-x-auto">
+      {/* ---------------- DESKTOP TABLE ---------------- */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="min-w-full border">
           <thead className="bg-[#162660] text-white">
             <tr>
@@ -164,16 +144,49 @@ const ManageLoans = () => {
                 </td>
               </tr>
             ))}
-
-            {filteredLoans.length === 0 && (
-              <tr>
-                <td colSpan="5" className="p-4 text-center">
-                  No loans found
-                </td>
-              </tr>
-            )}
           </tbody>
         </table>
+      </div>
+
+      {/* ---------------- MOBILE CARDS ---------------- */}
+      <div className="md:hidden space-y-4">
+        {filteredLoans.map((loan) => (
+          <div
+            key={loan._id}
+            className="bg-white shadow rounded-lg p-4 flex gap-4"
+          >
+            <img
+              src={loan.image}
+              alt={loan.title}
+              className="w-20 h-16 object-cover rounded"
+            />
+
+            <div className="flex-1">
+              <h3 className="font-semibold">{loan.title}</h3>
+              <p className="text-sm">Interest: {loan.interestRate}%</p>
+              <p className="text-sm">Category: {loan.category}</p>
+
+              <div className="mt-3 flex gap-2">
+                <button
+                  onClick={() => handleEdit(loan)}
+                  className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(loan._id)}
+                  className="bg-red-500 text-white px-3 py-1 rounded text-sm"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {filteredLoans.length === 0 && (
+          <p className="text-center text-gray-500">No loans found</p>
+        )}
       </div>
     </div>
   );

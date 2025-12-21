@@ -1,7 +1,7 @@
 import { NavLink } from "react-router";
 import useRole from "../../hooks/useRole";
 
-const DashboardSidebar = () => {
+const DashboardSidebar = ({ onClose }) => {
   const { role } = useRole();
 
   const linkClass = ({ isActive }) =>
@@ -13,10 +13,10 @@ const DashboardSidebar = () => {
      }`;
 
   return (
-    <aside className="w-64 bg-[#162660] text-white p-5 min-h-full">
+    <aside className="w-64 bg-[#162660] text-white p-5 h-full">
       <h2 className="text-xl font-bold mb-6">Dashboard</h2>
 
-      <nav className="space-y-2">
+      <nav className="space-y-2" onClick={onClose}>
         {/* -------- Borrower -------- */}
         {role === "borrower" && (
           <>
@@ -41,7 +41,6 @@ const DashboardSidebar = () => {
             <NavLink to="/dashboard/pending-loans" className={linkClass}>
               Pending Loans
             </NavLink>
-
             <NavLink to="/dashboard/approved-loans" className={linkClass}>
               Approved Loans
             </NavLink>
@@ -57,11 +56,9 @@ const DashboardSidebar = () => {
             <NavLink to="/dashboard/admin/all-loans" className={linkClass}>
               All Loans
             </NavLink>
-
             <NavLink to="/dashboard/admin/applications" className={linkClass}>
               Loan Applications
             </NavLink>
-
             <NavLink to="/dashboard/admin/manage-users" className={linkClass}>
               Manage Users
             </NavLink>
