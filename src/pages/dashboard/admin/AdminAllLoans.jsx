@@ -69,7 +69,6 @@ const AdminAllLoans = () => {
         interestRate: Number(editLoan.interest), // keep in sync
         maxLimit: Number(editLoan.maxLimit),
 
-        // must be ARRAY
         emiPlans: Array.isArray(editLoan.emiPlans)
           ? editLoan.emiPlans
           : editLoan.emiPlans
@@ -81,55 +80,56 @@ const AdminAllLoans = () => {
 
       Swal.fire("Updated", "Loan updated globally", "success");
       setEditLoan(null);
-      fetchLoans(); // reload from MongoDB
+      fetchLoans();
     } catch (err) {
       console.error(err);
       Swal.fire("Error", "Database update failed", "error");
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div className="p-6">Loading...</div>;
 
   return (
-    <div className="p-5">
-      <h1 className="text-2xl font-bold mb-5">All Loans</h1>
+    <div className="p-4 md:p-6">
+      <h1 className="text-2xl md:text-3xl font-bold mb-5">All Loans</h1>
 
-      <div className="overflow-x-auto">
+      {/* ---------- DESKTOP TABLE ---------- */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="min-w-full border">
           <thead className="bg-[#162660] text-white">
             <tr>
-              <th>Image</th>
-              <th>Title</th>
-              <th>Interest</th>
-              <th>Category</th>
-              <th>Created By</th>
-              <th>Show on Home</th>
-              <th>Actions</th>
+              <th className="p-2">Image</th>
+              <th className="p-2">Title</th>
+              <th className="p-2">Interest</th>
+              <th className="p-2">Category</th>
+              <th className="p-2">Created By</th>
+              <th className="p-2">Show on Home</th>
+              <th className="p-2">Actions</th>
             </tr>
           </thead>
 
           <tbody>
             {loans.map((loan) => (
               <tr key={loan._id} className="border-t text-center">
-                <td>
+                <td className="p-2">
                   <img
                     src={loan.image}
                     alt=""
-                    className="w-16 h-12 object-cover mx-auto"
+                    className="w-16 h-12 object-cover mx-auto rounded"
                   />
                 </td>
-                <td>{loan.title}</td>
-                <td>{loan.interest}%</td>
-                <td>{loan.category}</td>
-                <td>{loan.createdBy || "Admin"}</td>
-                <td>
+                <td className="p-2">{loan.title}</td>
+                <td className="p-2">{loan.interest}%</td>
+                <td className="p-2">{loan.category}</td>
+                <td className="p-2">{loan.createdBy || "Admin"}</td>
+                <td className="p-2">
                   <input
                     type="checkbox"
                     checked={loan.showOnHome || false}
                     onChange={() => toggleShowOnHome(loan)}
                   />
                 </td>
-                <td className="space-x-2">
+                <td className="p-2 space-x-2">
                   <button
                     onClick={() => setEditLoan(loan)}
                     className="bg-blue-500 text-white px-2 py-1 rounded"
@@ -149,10 +149,54 @@ const AdminAllLoans = () => {
         </table>
       </div>
 
-      {/* EDIT MODAL */}
+      {/* ---------- MOBILE CARDS ---------- */}
+      <div className="md:hidden space-y-4">
+        {loans.map((loan) => (
+          <div
+            key={loan._id}
+            className="bg-white p-4 rounded-xl shadow flex flex-col gap-2"
+          >
+            <img
+              src={loan.image}
+              alt=""
+              className="w-full h-40 object-cover rounded"
+            />
+            <p className="font-semibold text-lg">{loan.title}</p>
+            <p>Interest: {loan.interest}%</p>
+            <p>Category: {loan.category}</p>
+            <p>Created By: {loan.createdBy || "Admin"}</p>
+            <div className="flex items-center gap-2">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={loan.showOnHome || false}
+                  onChange={() => toggleShowOnHome(loan)}
+                />
+                Show on Home
+              </label>
+            </div>
+            <div className="flex gap-2 mt-2">
+              <button
+                onClick={() => setEditLoan(loan)}
+                className="flex-1 bg-blue-500 text-white py-1 rounded"
+              >
+                Update
+              </button>
+              <button
+                onClick={() => deleteLoan(loan._id)}
+                className="flex-1 bg-red-500 text-white py-1 rounded"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ---------- EDIT MODAL ---------- */}
       {editLoan && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded w-96 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white p-6 rounded w-full max-w-md max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-bold mb-4">Edit Loan</h2>
 
             <input
@@ -224,7 +268,7 @@ const AdminAllLoans = () => {
               placeholder="EMI Plans (6 Months, 12 Months, 24 Months)"
             />
 
-            <div className="flex justify-end gap-2 mt-4">
+            <div className="flex flex-col md:flex-row justify-end gap-2 mt-4">
               <button
                 onClick={() => setEditLoan(null)}
                 className="px-3 py-1 border rounded"

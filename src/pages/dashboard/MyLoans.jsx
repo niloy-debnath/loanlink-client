@@ -194,6 +194,56 @@ const MyLoans = () => {
         </table>
       </div>
 
+      {/* MOBILE VIEW - ONLY ADDITION */}
+      <div className="md:hidden space-y-4">
+        {loans.map((loan) => (
+          <div key={loan._id} className="bg-white rounded-xl shadow p-4 ">
+            <h3 className="font-semibold text-lg mb-1">{loan.loanTitle}</h3>
+
+            <p className="text-sm">
+              <b>Amount:</b> ${loan.loanAmount}
+            </p>
+            <p className="text-sm">
+              <b>Status:</b> {loan.status}
+            </p>
+            <p className="text-sm mb-3">
+              <b>Fee:</b> {loan.applicationFeeStatus}
+            </p>
+
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={() => handleViewLoan(loan)}
+                className="w-full px-3 py-2 bg-blue-600 text-white rounded"
+              >
+                View
+              </button>
+
+              {loan.status === "Pending" && (
+                <button
+                  onClick={() => cancelApplication(loan._id)}
+                  className="w-full px-3 py-2 bg-red-600 text-white rounded"
+                >
+                  Cancel
+                </button>
+              )}
+
+              {loan.applicationFeeStatus === "Unpaid" ? (
+                <button
+                  onClick={() => setPayingLoan(loan)}
+                  className="w-full px-3 py-2 bg-green-600 text-white rounded"
+                >
+                  Pay $10
+                </button>
+              ) : (
+                <span className="w-full text-center px-3 py-2 bg-green-100 text-green-700 rounded">
+                  Paid
+                </span>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* STRIPE MODAL */}
       {payingLoan && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
