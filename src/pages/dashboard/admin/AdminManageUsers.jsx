@@ -3,6 +3,8 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import PageTitle from "../../../components/PageTitle";
 
+const USERS_PER_PAGE = 5;
+
 const AdminManageUsers = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,12 +13,15 @@ const AdminManageUsers = () => {
   const [suspendUser, setSuspendUser] = useState(null);
   const [suspendReason, setSuspendReason] = useState("");
 
-  // 🔍 search & filter state
+  // search & filter
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  // Fetch all users
+  // pagination
+  const [currentPage, setCurrentPage] = useState(1);
+
+  /* ---------- FETCH USERS ---------- */
   const fetchUsers = async () => {
     try {
       setLoading(true);
@@ -34,7 +39,12 @@ const AdminManageUsers = () => {
     fetchUsers();
   }, []);
 
-  // Update user role
+  /* ---------- RESET PAGE ON FILTER CHANGE ---------- */
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, roleFilter, statusFilter]);
+
+  /* ---------- ROLE UPDATE ---------- */
   const updateRole = async (userId, newRole) => {
     try {
       await axios.put(`http://localhost:5000/users/${userId}/role`, {
@@ -42,13 +52,12 @@ const AdminManageUsers = () => {
       });
       Swal.fire("Success", "User role updated", "success");
       fetchUsers();
-    } catch (err) {
-      console.error(err);
+    } catch {
       Swal.fire("Error", "Failed to update role", "error");
     }
   };
 
-  // Suspend
+  /* ---------- SUSPEND ---------- */
   const handleSuspend = async () => {
     try {
       await axios.put(
@@ -62,13 +71,11 @@ const AdminManageUsers = () => {
       setSuspendUser(null);
       setSuspendReason("");
       fetchUsers();
-    } catch (err) {
-      console.error(err);
+    } catch {
       Swal.fire("Error", "Failed to suspend user", "error");
     }
   };
 
-  // Unsuspend
   const handleUnsuspend = async (user) => {
     try {
       await axios.put(`http://localhost:5000/users/${user._id}/suspend`, {
@@ -77,13 +84,12 @@ const AdminManageUsers = () => {
       });
       Swal.fire("Success", "User unsuspended", "success");
       fetchUsers();
-    } catch (err) {
-      console.error(err);
+    } catch {
       Swal.fire("Error", "Failed to unsuspend user", "error");
     }
   };
 
-  // 🧠 Filtered users (search + role + status)
+  /* ---------- FILTER USERS ---------- */
   const filteredUsers = useMemo(() => {
     return users.filter((user) => {
       const matchesSearch =
@@ -101,6 +107,14 @@ const AdminManageUsers = () => {
     });
   }, [users, search, roleFilter, statusFilter]);
 
+  /* ---------- PAGINATION LOGIC ---------- */
+  const totalPages = Math.ceil(filteredUsers.length / USERS_PER_PAGE);
+
+  const paginatedUsers = filteredUsers.slice(
+    (currentPage - 1) * USERS_PER_PAGE,
+    currentPage * USERS_PER_PAGE
+  );
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-full p-6">
@@ -112,10 +126,9 @@ const AdminManageUsers = () => {
   return (
     <div className="p-4 md:p-6">
       <PageTitle title="Manage Users" />
-
       <h1 className="text-2xl md:text-3xl font-bold mb-4">Manage Users</h1>
 
-      {/* 🔍 SEARCH & FILTER BAR */}
+      {/* ---------- SEARCH & FILTER ---------- */}
       <div className="flex flex-col md:flex-row gap-3 mb-5">
         <input
           type="text"
@@ -149,7 +162,7 @@ const AdminManageUsers = () => {
 
       {/* ---------- DESKTOP TABLE ---------- */}
       <div className="hidden md:block overflow-x-auto">
-        <table className="min-w-full table-auto border border-gray-300">
+        <table className="min-w-full border border-gray-300">
           <thead className="bg-[#162660] text-white">
             <tr>
               <th className="px-4 py-2">Name</th>
@@ -160,7 +173,7 @@ const AdminManageUsers = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredUsers.map((user) => (
+            {paginatedUsers.map((user) => (
               <tr key={user._id} className="text-center border-t">
                 <td className="px-4 py-2">{user.name}</td>
                 <td className="px-4 py-2">{user.email}</td>
@@ -181,14 +194,14 @@ const AdminManageUsers = () => {
                 <td className="px-4 py-2 space-x-2">
                   {!user.suspended ? (
                     <button
-                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                      className="bg-red-500 text-white px-3 py-1 rounded"
                       onClick={() => setSuspendUser(user)}
                     >
                       Suspend
                     </button>
                   ) : (
                     <button
-                      className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                      className="bg-green-500 text-white px-3 py-1 rounded"
                       onClick={() => handleUnsuspend(user)}
                     >
                       Unsuspend
@@ -201,13 +214,10 @@ const AdminManageUsers = () => {
         </table>
       </div>
 
-      {/* ---------- MOBILE CARDS ---------- */}
+      {/* ---------- MOBILE ---------- */}
       <div className="md:hidden space-y-4">
-        {filteredUsers.map((user) => (
-          <div
-            key={user._id}
-            className="bg-white p-4 rounded-xl shadow flex flex-col gap-2"
-          >
+        {paginatedUsers.map((user) => (
+          <div key={user._id} className="bg-white p-4 rounded-xl shadow">
             <p>
               <strong>Name:</strong> {user.name}
             </p>
@@ -215,66 +225,42 @@ const AdminManageUsers = () => {
               <strong>Email:</strong> {user.email}
             </p>
             <p>
-              <strong>Role:</strong>
-              <select
-                value={user.role}
-                onChange={(e) => updateRole(user._id, e.target.value)}
-                className="p-1 border rounded w-full mt-1"
-              >
-                <option value="borrower">Borrower</option>
-                <option value="manager">Manager</option>
-                <option value="admin">Admin</option>
-              </select>
-            </p>
-            <p>
               <strong>Status:</strong> {user.suspended ? "Suspended" : "Active"}
             </p>
-            {!user.suspended ? (
-              <button
-                className="bg-red-500 text-white py-1 rounded hover:bg-red-600"
-                onClick={() => setSuspendUser(user)}
-              >
-                Suspend
-              </button>
-            ) : (
-              <button
-                className="bg-green-500 text-white py-1 rounded hover:bg-green-600"
-                onClick={() => handleUnsuspend(user)}
-              >
-                Unsuspend
-              </button>
-            )}
           </div>
         ))}
       </div>
 
-      {/* ---------- SUSPEND MODAL ---------- */}
-      {suspendUser && (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-4">
-          <div className="bg-white rounded p-6 w-full max-w-md relative">
+      {/* ---------- PAGINATION UI ---------- */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-2 mt-6">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((p) => p - 1)}
+            className="px-3 py-1 border rounded disabled:opacity-50"
+          >
+            Prev
+          </button>
+
+          {[...Array(totalPages).keys()].map((n) => (
             <button
-              onClick={() => setSuspendUser(null)}
-              className="absolute top-2 right-2 font-bold"
+              key={n}
+              onClick={() => setCurrentPage(n + 1)}
+              className={`px-3 py-1 border rounded ${
+                currentPage === n + 1 ? "bg-[#162660] text-white" : ""
+              }`}
             >
-              ✖
+              {n + 1}
             </button>
-            <h2 className="text-xl font-bold mb-4">Suspend User</h2>
-            <p className="mb-2">
-              Reason for suspending <strong>{suspendUser.name}</strong>:
-            </p>
-            <textarea
-              value={suspendReason}
-              onChange={(e) => setSuspendReason(e.target.value)}
-              className="w-full border rounded p-2 mb-4"
-              rows={4}
-            />
-            <button
-              className="bg-red-500 text-white py-2 rounded w-full hover:bg-red-600"
-              onClick={handleSuspend}
-            >
-              Confirm Suspend
-            </button>
-          </div>
+          ))}
+
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((p) => p + 1)}
+            className="px-3 py-1 border rounded disabled:opacity-50"
+          >
+            Next
+          </button>
         </div>
       )}
     </div>
