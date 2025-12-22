@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
-import axios from "axios";
+import axios from "../../../axiosConfig";
 import toast from "react-hot-toast";
 import { useAuth } from "../../hooks/useAuth";
 import { TbFidgetSpinner } from "react-icons/tb";

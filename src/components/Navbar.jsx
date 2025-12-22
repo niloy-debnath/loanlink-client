@@ -21,16 +21,31 @@ const Navbar = () => {
       }
 
       try {
+        // Send Firebase token to backend to get JWT cookie
+        await fetch(`${import.meta.env.VITE_API_URL}/jwt`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            firebaseToken: await currentUser.getIdToken(),
+          }),
+          credentials: "include", // Important to store httpOnly cookie
+        });
+
+        // Fetch user info from backend
         const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/users/${currentUser.email}`
+          `${import.meta.env.VITE_API_URL}/users/${currentUser.email}`,
+          { credentials: "include" } // include JWT cookie
         );
+
+        if (!res.ok) throw new Error("Failed to fetch user");
+
         const dbUser = await res.json();
 
         setUser({
           uid: currentUser.uid,
           email: currentUser.email,
           displayName: dbUser.name || currentUser.displayName,
-          photoURL: dbUser.photoURL || null, // ✅ ONLY MongoDB
+          photoURL: dbUser.photoURL || null,
           role: dbUser.role || null,
         });
       } catch (err) {
@@ -51,6 +66,11 @@ const Navbar = () => {
   /* ================= LOGOUT ================= */
   const handleLogout = async () => {
     await signOut(auth);
+    // Clear backend JWT cookie
+    await fetch(`${import.meta.env.VITE_API_URL}/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
     setUser(null);
     setOpenDropdown(false);
   };
@@ -218,7 +238,10 @@ const Navbar = () => {
               <NavLink to="/profile" className={navItemClass}>
                 Profile
               </NavLink>
-              <button onClick={handleLogout} className={navItemClass}>
+              <button
+                onClick={handleLogout}
+                className={navItemClass({ isActive: false })}
+              >
                 Logout
               </button>
             </>

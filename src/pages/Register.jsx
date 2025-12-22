@@ -5,7 +5,7 @@ import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../firebase/firebase.config";
 import { toast } from "react-hot-toast";
 import loginBg from "../assets/login-bg.png";
-import axios from "axios";
+import axios from "../../axiosConfig";
 import PageTitle from "../components/PageTitle";
 
 const Register = () => {

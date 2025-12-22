@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../../../../axiosConfig";
 import Swal from "sweetalert2";
 import { useState } from "react";
 import useAuth from "../../../hooks/useAuth";

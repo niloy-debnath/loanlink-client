@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../../../../axiosConfig";
 import Swal from "sweetalert2";
 import { TbFidgetSpinner } from "react-icons/tb";
 import PageTitle from "../../../components/PageTitle";

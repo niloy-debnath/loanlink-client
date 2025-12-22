@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../../../../axiosConfig";
 import { TbFidgetSpinner } from "react-icons/tb";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";

@@ -1,10 +1,11 @@
 import { useParams, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../../axiosConfig";
 import { TbFidgetSpinner } from "react-icons/tb";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../hooks/useAuth"; // your firebase auth
 import PageTitle from "../components/PageTitle";
+import TestToken from "../components/TestToken,jsx";
 
 const LoanDetailsPage = () => {
   const { loanId } = useParams();
@@ -67,6 +68,7 @@ const LoanDetailsPage = () => {
 
   return (
     <div className="min-h-[80vh] bg-gray-100 py-12 px-4 md:px-12">
+      <TestToken></TestToken>
       <PageTitle title="Details"></PageTitle>
       <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden p-6 md:p-10 flex flex-col md:flex-col gap-6">
         {/* Loan info content */}

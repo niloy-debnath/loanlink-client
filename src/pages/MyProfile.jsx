@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../../axiosConfig";
 import Swal from "sweetalert2";
 import { TbEdit, TbLogout, TbUser } from "react-icons/tb";
 import { signOut } from "firebase/auth";

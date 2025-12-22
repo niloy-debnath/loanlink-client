@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import axios from "axios";
+import axios from "../../../axiosConfig";
 import { HiArrowCircleRight } from "react-icons/hi";
 import { TbFidgetSpinner } from "react-icons/tb";
 

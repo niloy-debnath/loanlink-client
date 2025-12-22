@@ -1,0 +1,24 @@
+import { useEffect } from "react";
+import { getAuth } from "firebase/auth";
+
+const TestToken = () => {
+  useEffect(() => {
+    const fetchToken = async () => {
+      const auth = getAuth();
+      const user = auth.currentUser;
+
+      if (user) {
+        const token = await user.getIdToken();
+        console.log("Firebase ID Token:", token);
+      } else {
+        console.log("No user logged in yet.");
+      }
+    };
+
+    fetchToken();
+  }, []);
+
+  return;
+};
+
+export default TestToken;

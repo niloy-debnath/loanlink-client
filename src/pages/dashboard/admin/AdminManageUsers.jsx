@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import axios from "axios";
+import axios from "../../../../axiosConfig";
 import Swal from "sweetalert2";
 import PageTitle from "../../../components/PageTitle";
 
