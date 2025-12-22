@@ -5,6 +5,7 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { TbSun, TbMoon } from "react-icons/tb";
 import cat from "../assets/cat.png";
 import Logo from "../shared/Logo";
+import axios from "../../axiosConfig"; // ✅ axios use
 
 const Navbar = () => {
   const [user, setUser] = useState(null);
@@ -21,25 +22,10 @@ const Navbar = () => {
       }
 
       try {
-        // Send Firebase token to backend to get JWT cookie
-        await fetch(`${import.meta.env.VITE_API_URL}/jwt`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            firebaseToken: await currentUser.getIdToken(),
-          }),
-          credentials: "include", // Important to store httpOnly cookie
-        });
+        // ✅ ONLY fetch user, NO /jwt here
+        const res = await axios.get(`/users/${currentUser.email}`);
 
-        // Fetch user info from backend
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/users/${currentUser.email}`,
-          { credentials: "include" } // include JWT cookie
-        );
-
-        if (!res.ok) throw new Error("Failed to fetch user");
-
-        const dbUser = await res.json();
+        const dbUser = res.data;
 
         setUser({
           uid: currentUser.uid,
@@ -66,11 +52,7 @@ const Navbar = () => {
   /* ================= LOGOUT ================= */
   const handleLogout = async () => {
     await signOut(auth);
-    // Clear backend JWT cookie
-    await fetch(`${import.meta.env.VITE_API_URL}/logout`, {
-      method: "POST",
-      credentials: "include",
-    });
+    await axios.post("/logout"); // ✅ axios
     setUser(null);
     setOpenDropdown(false);
   };
@@ -98,7 +80,6 @@ const Navbar = () => {
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
-        {/* Logo */}
         <Logo />
 
         {/* Desktop Menu */}
@@ -152,14 +133,12 @@ const Navbar = () => {
                   </span>
                 </button>
 
-                {/* Role Badge */}
                 {user.role && (
                   <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-600 text-white">
                     {user.role.toUpperCase()}
                   </span>
                 )}
 
-                {/* Dropdown */}
                 {openDropdown && (
                   <ul className="absolute right-0 mt-2 w-40 bg-white text-[#162660] rounded-md shadow-lg border overflow-hidden z-50">
                     <li>
@@ -185,7 +164,6 @@ const Navbar = () => {
             </>
           )}
 
-          {/* Theme */}
           <li>
             <button
               onClick={toggleTheme}
@@ -211,17 +189,11 @@ const Navbar = () => {
           <NavLink to="/" className={navItemClass}>
             Home
           </NavLink>
-          <NavLink to="dashboard" className={navItemClass}>
+          <NavLink to="/dashboard" className={navItemClass}>
             Dashboard
           </NavLink>
           <NavLink to="/loans" className={navItemClass}>
             All Loans
-          </NavLink>
-          <NavLink to="/contact" className={navItemClass}>
-            Contact
-          </NavLink>
-          <NavLink to="/about" className={navItemClass}>
-            About
           </NavLink>
 
           {!user ? (

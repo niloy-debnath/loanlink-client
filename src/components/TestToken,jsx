@@ -9,7 +9,6 @@ const TestToken = () => {
 
       if (user) {
         const token = await user.getIdToken();
-        console.log("Firebase ID Token:", token);
       } else {
         console.log("No user logged in yet.");
       }

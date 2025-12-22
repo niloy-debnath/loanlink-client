@@ -78,7 +78,7 @@ const ManageLoans = () => {
 
     if (!value) return;
 
-    await axios.put(`${import.meta.env.VITE_API_URL}/${loan._id}`, value);
+    await axios.put(`${import.meta.env.VITE_API_URL}/loans/${loan._id}`, value);
     Swal.fire("Updated", "Loan updated successfully", "success");
     fetchLoans();
   };
