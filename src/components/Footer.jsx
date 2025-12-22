@@ -1,3 +1,4 @@
+import { NavLink } from "react-router";
 import Logo from "../shared/Logo";
 import {
   FaFacebookF,
@@ -32,7 +33,7 @@ const Footer = () => {
           <h4 className="footer-title-sm">Quick Links</h4>
           <ul className="footer-list-sm">
             <li>
-              <Navlink to="/">Home</Navlink>
+              <NavLink to="/">Home</NavLink>
             </li>
             <li>Loans</li>
             <li>Apply</li>
