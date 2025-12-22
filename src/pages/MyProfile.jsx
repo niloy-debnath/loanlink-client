@@ -6,6 +6,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../firebase/firebase.config";
 import useAuth from "../hooks/useAuth";
 import PageTitle from "../components/PageTitle";
+import publicAxios from "../../publicAxios";
 
 const MyProfile = () => {
   const { user, setUser } = useAuth();
@@ -60,7 +61,7 @@ const MyProfile = () => {
     const formData = new FormData();
     formData.append("image", file);
 
-    const res = await axios.post(
+    const res = await publicAxios.post(
       `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_KEY}`,
       formData
     );

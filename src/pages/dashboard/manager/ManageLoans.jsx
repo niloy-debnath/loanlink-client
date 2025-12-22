@@ -14,7 +14,7 @@ const ManageLoans = () => {
     try {
       setLoading(true);
       const res = await axios.get(
-        `http://localhost:5000/loans/manager/${user.email}`
+        `${import.meta.env.VITE_API_URL}/loans/manager/${user.email}`
       );
       setLoans(res.data);
     } catch {
@@ -40,7 +40,7 @@ const ManageLoans = () => {
 
     if (!confirm.isConfirmed) return;
 
-    await axios.delete(`http://localhost:5000/loans/${id}`);
+    await axios.delete(`${import.meta.env.VITE_API_URL}/loans/${id}`);
     Swal.fire("Deleted", "Loan removed successfully", "success");
     fetchLoans();
   };
@@ -78,7 +78,7 @@ const ManageLoans = () => {
 
     if (!value) return;
 
-    await axios.put(`http://localhost:5000/loans/${loan._id}`, value);
+    await axios.put(`${import.meta.env.VITE_API_URL}/${loan._id}`, value);
     Swal.fire("Updated", "Loan updated successfully", "success");
     fetchLoans();
   };

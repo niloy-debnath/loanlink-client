@@ -25,7 +25,7 @@ const AdminManageUsers = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:5000/users");
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/users`);
       setUsers(res.data);
     } catch (err) {
       console.error(err);
@@ -47,7 +47,7 @@ const AdminManageUsers = () => {
   /* ---------- ROLE UPDATE ---------- */
   const updateRole = async (userId, newRole) => {
     try {
-      await axios.put(`http://localhost:5000/users/${userId}/role`, {
+      await axios.put(`${import.meta.env.VITE_API_URL}/users/${userId}/role`, {
         role: newRole,
       });
       Swal.fire("Success", "User role updated", "success");
@@ -61,7 +61,7 @@ const AdminManageUsers = () => {
   const handleSuspend = async () => {
     try {
       await axios.put(
-        `http://localhost:5000/users/${suspendUser._id}/suspend`,
+        `${import.meta.env.VITE_API_URL}users/${suspendUser._id}/suspend`,
         {
           suspended: true,
           reason: suspendReason,
@@ -78,10 +78,13 @@ const AdminManageUsers = () => {
 
   const handleUnsuspend = async (user) => {
     try {
-      await axios.put(`http://localhost:5000/users/${user._id}/suspend`, {
-        suspended: false,
-        reason: "",
-      });
+      await axios.put(
+        `${import.meta.env.VITE_API_URL}/users/${user._id}/suspend`,
+        {
+          suspended: false,
+          reason: "",
+        }
+      );
       Swal.fire("Success", "User unsuspended", "success");
       fetchUsers();
     } catch {

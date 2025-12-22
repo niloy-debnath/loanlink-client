@@ -15,7 +15,7 @@ const AdminAllLoans = () => {
   const fetchLoans = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://localhost:5000/loans");
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/loans`);
       setLoans(res.data);
     } catch (err) {
       console.error("Failed to fetch loans:", err);
@@ -26,7 +26,7 @@ const AdminAllLoans = () => {
 
   const toggleShowOnHome = async (loan) => {
     try {
-      await axios.put(`http://localhost:5000/loans/${loan._id}`, {
+      await axios.put(`${import.meta.env.VITE_API_URL}/loans/${loan._id}`, {
         showOnHome: !loan.showOnHome,
       });
       fetchLoans();
@@ -47,7 +47,7 @@ const AdminAllLoans = () => {
 
     if (confirm.isConfirmed) {
       try {
-        await axios.delete(`http://localhost:5000/loans/${id}`);
+        await axios.delete(`${import.meta.env.VITE_API_URL}/loans/${id}`);
         Swal.fire("Deleted", "Loan deleted successfully", "success");
         fetchLoans();
       } catch (err) {
@@ -77,7 +77,10 @@ const AdminAllLoans = () => {
           : [],
       };
 
-      await axios.put(`http://localhost:5000/loans/${editLoan._id}`, payload);
+      await axios.put(
+        `${import.meta.env.VITE_API_URL}/loans/${editLoan._id}`,
+        payload
+      );
 
       Swal.fire("Updated", "Loan updated globally", "success");
       setEditLoan(null);

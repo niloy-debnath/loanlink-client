@@ -36,7 +36,14 @@ const Router = createBrowserRouter([
       { path: "/", element: <Home /> },
       { path: "/loans", element: <AllLoansPage /> },
       { path: "/about", element: <About /> },
-      { path: "/profile", element: <MyProfile></MyProfile> },
+      {
+        path: "/profile",
+        element: (
+          <ProtectedRoute>
+            <MyProfile></MyProfile>
+          </ProtectedRoute>
+        ),
+      },
       { path: "/contact", element: <Contact /> },
       {
         path: "/loans/:loanId",

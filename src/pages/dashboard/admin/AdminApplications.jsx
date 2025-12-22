@@ -14,7 +14,9 @@ const AdminApplications = () => {
   const fetchApplications = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:5000/loan-applications");
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/loan-applications`
+      );
       setApplications(res.data);
       setLoading(false);
     } catch (err) {
@@ -37,9 +39,12 @@ const AdminApplications = () => {
   // Approve / Reject handler
   const updateStatus = async (id, status) => {
     try {
-      await axios.put(`http://localhost:5000/loan-applications/${id}/status`, {
-        status,
-      });
+      await axios.put(
+        `${import.meta.env.VITE_API_URL}/loan-applications/${id}/status`,
+        {
+          status,
+        }
+      );
 
       Swal.fire("Success", `Application ${status}`, "success");
       fetchApplications(); // refresh table

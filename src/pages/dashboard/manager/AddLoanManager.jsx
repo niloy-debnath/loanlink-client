@@ -1,8 +1,9 @@
-import axios from "../../../../axiosConfig";
+import axios from "../../../../axiosConfig"; // ✅ uses withCredentials
 import Swal from "sweetalert2";
 import { useState } from "react";
 import useAuth from "../../../hooks/useAuth";
 import PageTitle from "../../../components/PageTitle";
+import publicAxios from "../../../../publicAxios";
 
 const AddLoanManager = () => {
   const { user } = useAuth();
@@ -21,7 +22,7 @@ const AddLoanManager = () => {
     showOnHome: false,
   });
 
-  const [imageFile, setImageFile] = useState(null); // 🔹 NEW
+  const [imageFile, setImageFile] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,18 +34,17 @@ const AddLoanManager = () => {
     try {
       setLoading(true);
 
-      /* ---------------- IMAGE UPLOAD ---------------- */
+      // ---------------- IMAGE UPLOAD ----------------
       const imageData = new FormData();
       imageData.append("image", imageFile);
 
-      const imgRes = await axios.post(
+      const imgRes = await publicAxios.post(
         `https://api.imgbb.com/1/upload?key=${imgbbKey}`,
         imageData
       );
-
       const imageUrl = imgRes.data.data.display_url;
 
-      /* ---------------- LOAN DATA ---------------- */
+      // ---------------- LOAN DATA ----------------
       const loanData = {
         title: form.title,
         description: form.description,
@@ -61,7 +61,8 @@ const AddLoanManager = () => {
         createdAt: new Date(),
       };
 
-      await axios.post("http://localhost:5000/loans", loanData);
+      // ✅ Send request to backend (cookie included automatically)
+      await axios.post("/loans", loanData);
 
       Swal.fire("Success", "Loan added successfully", "success");
       e.target.reset();
@@ -75,7 +76,7 @@ const AddLoanManager = () => {
   };
 
   return (
-    <div className="p-6  min-h-screen">
+    <div className="p-6 min-h-screen">
       <PageTitle title="Add Loan"></PageTitle>
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-8">
         {/* Header */}
@@ -95,7 +96,6 @@ const AddLoanManager = () => {
             <h2 className="text-lg font-semibold text-[#162660] mb-4">
               Basic Information
             </h2>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input
                 label="Loan Title"
@@ -106,7 +106,6 @@ const AddLoanManager = () => {
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
               />
             </div>
-
             <div className="mt-4">
               <Textarea
                 label="Loan Description"
@@ -122,7 +121,6 @@ const AddLoanManager = () => {
             <h2 className="text-lg font-semibold text-[#162660] mb-4">
               Financial Details
             </h2>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input
                 type="number"
@@ -144,7 +142,6 @@ const AddLoanManager = () => {
             <h2 className="text-lg font-semibold text-[#162660] mb-4">
               Loan Configuration
             </h2>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input
                 label="EMI Plans (comma separated)"
@@ -209,7 +206,6 @@ const AddLoanManager = () => {
 export default AddLoanManager;
 
 /* ---------- Reusable Components ---------- */
-
 const Input = ({ label, type = "text", onChange }) => (
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-1">
