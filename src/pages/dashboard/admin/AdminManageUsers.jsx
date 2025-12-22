@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import PageTitle from "../../../components/PageTitle";
@@ -6,8 +6,15 @@ import PageTitle from "../../../components/PageTitle";
 const AdminManageUsers = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // suspend modal
   const [suspendUser, setSuspendUser] = useState(null);
   const [suspendReason, setSuspendReason] = useState("");
+
+  // 🔍 search & filter state
+  const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   // Fetch all users
   const fetchUsers = async () => {
@@ -15,11 +22,11 @@ const AdminManageUsers = () => {
       setLoading(true);
       const res = await axios.get("http://localhost:5000/users");
       setUsers(res.data);
-      setLoading(false);
     } catch (err) {
       console.error(err);
-      setLoading(false);
       Swal.fire("Error", "Failed to fetch users", "error");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -41,7 +48,7 @@ const AdminManageUsers = () => {
     }
   };
 
-  // Suspend/Un-suspend handler
+  // Suspend
   const handleSuspend = async () => {
     try {
       await axios.put(
@@ -61,6 +68,7 @@ const AdminManageUsers = () => {
     }
   };
 
+  // Unsuspend
   const handleUnsuspend = async (user) => {
     try {
       await axios.put(`http://localhost:5000/users/${user._id}/suspend`, {
@@ -75,17 +83,69 @@ const AdminManageUsers = () => {
     }
   };
 
-  if (loading)
+  // 🧠 Filtered users (search + role + status)
+  const filteredUsers = useMemo(() => {
+    return users.filter((user) => {
+      const matchesSearch =
+        user.name.toLowerCase().includes(search.toLowerCase()) ||
+        user.email.toLowerCase().includes(search.toLowerCase());
+
+      const matchesRole = roleFilter === "all" || user.role === roleFilter;
+
+      const matchesStatus =
+        statusFilter === "all" ||
+        (statusFilter === "active" && !user.suspended) ||
+        (statusFilter === "suspended" && user.suspended);
+
+      return matchesSearch && matchesRole && matchesStatus;
+    });
+  }, [users, search, roleFilter, statusFilter]);
+
+  if (loading) {
     return (
       <div className="flex justify-center items-center h-full p-6">
         Loading...
       </div>
     );
+  }
 
   return (
     <div className="p-4 md:p-6">
-      <PageTitle title="Manage Users"></PageTitle>
-      <h1 className="text-2xl md:text-3xl font-bold mb-5">Manage Users</h1>
+      <PageTitle title="Manage Users" />
+
+      <h1 className="text-2xl md:text-3xl font-bold mb-4">Manage Users</h1>
+
+      {/* 🔍 SEARCH & FILTER BAR */}
+      <div className="flex flex-col md:flex-row gap-3 mb-5">
+        <input
+          type="text"
+          placeholder="Search by name or email"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="border rounded px-3 py-2 w-full md:w-1/3"
+        />
+
+        <select
+          value={roleFilter}
+          onChange={(e) => setRoleFilter(e.target.value)}
+          className="border rounded px-3 py-2 w-full md:w-1/4"
+        >
+          <option value="all">All Roles</option>
+          <option value="borrower">Borrower</option>
+          <option value="manager">Manager</option>
+          <option value="admin">Admin</option>
+        </select>
+
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="border rounded px-3 py-2 w-full md:w-1/4"
+        >
+          <option value="all">All Status</option>
+          <option value="active">Active</option>
+          <option value="suspended">Suspended</option>
+        </select>
+      </div>
 
       {/* ---------- DESKTOP TABLE ---------- */}
       <div className="hidden md:block overflow-x-auto">
@@ -100,7 +160,7 @@ const AdminManageUsers = () => {
             </tr>
           </thead>
           <tbody>
-            {users.map((user) => (
+            {filteredUsers.map((user) => (
               <tr key={user._id} className="text-center border-t">
                 <td className="px-4 py-2">{user.name}</td>
                 <td className="px-4 py-2">{user.email}</td>
@@ -143,7 +203,7 @@ const AdminManageUsers = () => {
 
       {/* ---------- MOBILE CARDS ---------- */}
       <div className="md:hidden space-y-4">
-        {users.map((user) => (
+        {filteredUsers.map((user) => (
           <div
             key={user._id}
             className="bg-white p-4 rounded-xl shadow flex flex-col gap-2"
@@ -155,11 +215,11 @@ const AdminManageUsers = () => {
               <strong>Email:</strong> {user.email}
             </p>
             <p>
-              <strong>Role:</strong>{" "}
+              <strong>Role:</strong>
               <select
                 value={user.role}
                 onChange={(e) => updateRole(user._id, e.target.value)}
-                className="p-1 border rounded w-full"
+                className="p-1 border rounded w-full mt-1"
               >
                 <option value="borrower">Borrower</option>
                 <option value="manager">Manager</option>
@@ -169,34 +229,32 @@ const AdminManageUsers = () => {
             <p>
               <strong>Status:</strong> {user.suspended ? "Suspended" : "Active"}
             </p>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {!user.suspended ? (
-                <button
-                  className="flex-1 bg-red-500 text-white py-1 rounded hover:bg-red-600"
-                  onClick={() => setSuspendUser(user)}
-                >
-                  Suspend
-                </button>
-              ) : (
-                <button
-                  className="flex-1 bg-green-500 text-white py-1 rounded hover:bg-green-600"
-                  onClick={() => handleUnsuspend(user)}
-                >
-                  Unsuspend
-                </button>
-              )}
-            </div>
+            {!user.suspended ? (
+              <button
+                className="bg-red-500 text-white py-1 rounded hover:bg-red-600"
+                onClick={() => setSuspendUser(user)}
+              >
+                Suspend
+              </button>
+            ) : (
+              <button
+                className="bg-green-500 text-white py-1 rounded hover:bg-green-600"
+                onClick={() => handleUnsuspend(user)}
+              >
+                Unsuspend
+              </button>
+            )}
           </div>
         ))}
       </div>
 
       {/* ---------- SUSPEND MODAL ---------- */}
       {suspendUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
-          <div className="bg-white rounded p-6 w-full max-w-md max-h-[90vh] overflow-y-auto relative">
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-4">
+          <div className="bg-white rounded p-6 w-full max-w-md relative">
             <button
               onClick={() => setSuspendUser(null)}
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 font-bold"
+              className="absolute top-2 right-2 font-bold"
             >
               ✖
             </button>
@@ -209,9 +267,9 @@ const AdminManageUsers = () => {
               onChange={(e) => setSuspendReason(e.target.value)}
               className="w-full border rounded p-2 mb-4"
               rows={4}
-            ></textarea>
+            />
             <button
-              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 w-full"
+              className="bg-red-500 text-white py-2 rounded w-full hover:bg-red-600"
               onClick={handleSuspend}
             >
               Confirm Suspend
