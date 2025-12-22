@@ -5,6 +5,7 @@ import useAuth from "../../../hooks/useAuth";
 import { TbFidgetSpinner } from "react-icons/tb";
 import { signOut } from "firebase/auth";
 import { auth } from "../../../firebase/firebase.config";
+import PageTitle from "../../../components/PageTitle";
 
 const MyProfileManager = () => {
   const { user, setUser, logout } = useAuth();
@@ -131,6 +132,8 @@ const MyProfileManager = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
+        <PageTitle title="Manager Profile"></PageTitle>
+
         <TbFidgetSpinner className="animate-spin text-5xl text-[#162660]" />
       </div>
     );

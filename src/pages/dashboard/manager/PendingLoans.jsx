@@ -3,6 +3,7 @@ import axios from "axios";
 import { TbFidgetSpinner } from "react-icons/tb";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
+import PageTitle from "../../../components/PageTitle";
 
 const PendingLoans = () => {
   const [loans, setLoans] = useState([]);
@@ -77,6 +78,7 @@ const PendingLoans = () => {
 
   return (
     <div className="p-4 sm:p-6  min-h-[80vh]">
+      <PageTitle title="Pending Loans"></PageTitle>
       <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-[#162660]">
         Pending Loan Applications
       </h2>

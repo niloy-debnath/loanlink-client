@@ -44,7 +44,7 @@ const DashboardSidebar = ({ onClose }) => {
             <NavLink to="/dashboard/approved-loans" className={linkClass}>
               Approved Loans
             </NavLink>
-            <NavLink to="/dashboard/profile" className={linkClass}>
+            <NavLink to="/dashboard/manager-profile" className={linkClass}>
               My Profile
             </NavLink>
           </>

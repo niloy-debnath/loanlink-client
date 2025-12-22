@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
+import PageTitle from "../../../components/PageTitle";
 
 const AdminApplications = () => {
   const [applications, setApplications] = useState([]);
@@ -10,11 +11,10 @@ const AdminApplications = () => {
   const [filter, setFilter] = useState("Pending");
 
   // Fetch all loan applications
-
   const fetchApplications = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:5000/loan-applications"); // <-- All applications
+      const res = await axios.get("http://localhost:5000/loan-applications");
       setApplications(res.data);
       setLoading(false);
     } catch (err) {
@@ -31,7 +31,6 @@ const AdminApplications = () => {
   // Filter applications by status
   useEffect(() => {
     const filtered = applications.filter((app) => app.status === filter);
-    console.log(filtered);
     setFilteredApps(filtered);
   }, [applications, filter]);
 
@@ -52,18 +51,21 @@ const AdminApplications = () => {
 
   if (loading)
     return (
-      <div className="flex justify-center items-center h-full">Loading...</div>
+      <div className="flex justify-center items-center h-full p-6">
+        Loading...
+      </div>
     );
 
   return (
-    <div className="p-5">
-      <h1 className="text-2xl font-bold mb-5">Loan Applications</h1>
+    <div className="p-4 md:p-6">
+      <PageTitle title="All Applications"></PageTitle>
+      <h1 className="text-2xl md:text-3xl font-bold mb-5">Loan Applications</h1>
 
       {/* Filter */}
-      <div className="mb-4">
-        <label className="mr-2 font-semibold">Filter by Status:</label>
+      <div className="mb-4 flex flex-col md:flex-row md:items-center gap-2">
+        <label className="font-semibold">Filter by Status:</label>
         <select
-          className="p-1 rounded border"
+          className="p-1 rounded border w-full md:w-auto"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
         >
@@ -73,10 +75,11 @@ const AdminApplications = () => {
         </select>
       </div>
 
-      {filteredApps.length === 0 ? (
-        <p>No applications found.</p>
-      ) : (
-        <div className="overflow-x-auto">
+      {/* ---------- DESKTOP TABLE ---------- */}
+      <div className="hidden md:block overflow-x-auto">
+        {filteredApps.length === 0 ? (
+          <p>No applications found.</p>
+        ) : (
           <table className="min-w-full table-auto border border-gray-300">
             <thead className="bg-[#162660] text-white">
               <tr>
@@ -97,14 +100,13 @@ const AdminApplications = () => {
                   <td className="px-4 py-2">${app.loanAmount}</td>
                   <td className="px-4 py-2">{app.status}</td>
                   <td className="px-4 py-2">
-                    <div className="flex justify-center items-center gap-2 whitespace-nowrap">
+                    <div className="flex justify-center items-center gap-2 flex-wrap">
                       <button
                         onClick={() => setSelectedApp(app)}
                         className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
                       >
                         View
                       </button>
-
                       {app.status === "Pending" && (
                         <>
                           <button
@@ -127,21 +129,75 @@ const AdminApplications = () => {
               ))}
             </tbody>
           </table>
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* Modal */}
+      {/* ---------- MOBILE CARDS ---------- */}
+      <div className="md:hidden space-y-4">
+        {filteredApps.length === 0 ? (
+          <p>No applications found.</p>
+        ) : (
+          filteredApps.map((app) => (
+            <div
+              key={app._id}
+              className="bg-white p-4 rounded-xl shadow flex flex-col gap-2"
+            >
+              <p>
+                <strong>Loan ID:</strong> {app._id}
+              </p>
+              <p>
+                <strong>User:</strong> {app.userEmail}
+              </p>
+              <p>
+                <strong>Category:</strong> {app.loanCategory}
+              </p>
+              <p>
+                <strong>Amount:</strong> ${app.loanAmount}
+              </p>
+              <p>
+                <strong>Status:</strong> {app.status}
+              </p>
+              <div className="flex flex-wrap gap-2 mt-2">
+                <button
+                  onClick={() => setSelectedApp(app)}
+                  className="flex-1 bg-blue-500 text-white py-1 rounded hover:bg-blue-600"
+                >
+                  View
+                </button>
+                {app.status === "Pending" && (
+                  <>
+                    <button
+                      onClick={() => updateStatus(app._id, "Approved")}
+                      className="flex-1 bg-green-500 text-white py-1 rounded hover:bg-green-600"
+                    >
+                      Approve
+                    </button>
+                    <button
+                      onClick={() => updateStatus(app._id, "Rejected")}
+                      className="flex-1 bg-red-500 text-white py-1 rounded hover:bg-red-600"
+                    >
+                      Reject
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* ---------- MODAL ---------- */}
       {selectedApp && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white rounded p-6 w-96 relative">
-            <h2 className="text-xl font-bold mb-4">Application Details</h2>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+          <div className="bg-white rounded p-6 w-full max-w-md max-h-[90vh] overflow-y-auto relative">
             <button
               onClick={() => setSelectedApp(null)}
               className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 font-bold"
             >
               ✖
             </button>
-            <div className="space-y-2">
+            <h2 className="text-xl font-bold mb-4">Application Details</h2>
+            <div className="space-y-2 text-sm">
               <p>
                 <strong>Loan Title:</strong> {selectedApp.loanTitle}
               </p>

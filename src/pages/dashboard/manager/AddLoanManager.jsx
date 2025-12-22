@@ -2,6 +2,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { useState } from "react";
 import useAuth from "../../../hooks/useAuth";
+import PageTitle from "../../../components/PageTitle";
 
 const AddLoanManager = () => {
   const { user } = useAuth();
@@ -75,6 +76,7 @@ const AddLoanManager = () => {
 
   return (
     <div className="p-6  min-h-screen">
+      <PageTitle title="Add Loan"></PageTitle>
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-8">
         {/* Header */}
         <div className="mb-8 border-b pb-4">

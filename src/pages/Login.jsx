@@ -6,6 +6,7 @@ import { auth, googleProvider } from "../firebase/firebase.config";
 import { toast } from "react-hot-toast";
 import { FcGoogle } from "react-icons/fc";
 import loginBg from "../assets/login-bg.png";
+import PageTitle from "../components/PageTitle";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -40,6 +41,7 @@ const Login = () => {
 
   return (
     <div className="min-h-[calc(100vh-80px)] flex items-center justify-center bg-gray-100 px-4">
+      <PageTitle title="Login"></PageTitle>
       <div className="flex flex-col md:flex-row items-center bg-white rounded-lg shadow-lg overflow-hidden max-w-4xl w-full">
         {/* Image Section */}
         <div className="hidden md:block md:w-1/2">

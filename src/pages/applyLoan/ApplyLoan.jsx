@@ -5,6 +5,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "../../hooks/useAuth";
 import { TbFidgetSpinner } from "react-icons/tb";
+import PageTitle from "../../components/PageTitle";
 
 const Input = ({ label, ...props }) => (
   <div>
@@ -97,6 +98,7 @@ const ApplyLoan = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#D0E6FD] to-[#F1E4D1] py-12 px-4">
+      <PageTitle title="Apply Loan"></PageTitle>
       <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="bg-[#162660] text-white p-8">

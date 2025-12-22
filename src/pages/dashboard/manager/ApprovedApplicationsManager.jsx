@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { TbFidgetSpinner } from "react-icons/tb";
+import PageTitle from "../../../components/PageTitle";
 
 const ApprovedApplicationsManager = () => {
   const [applications, setApplications] = useState([]);
@@ -62,6 +63,7 @@ const ApprovedApplicationsManager = () => {
 
   return (
     <div className="p-4 md:p-6  min-h-[80vh]">
+      <PageTitle title="Approved Loans"></PageTitle>
       <h2 className="text-2xl md:text-3xl font-bold mb-6 text-[#162660]">
         Approved Loan Applications
       </h2>

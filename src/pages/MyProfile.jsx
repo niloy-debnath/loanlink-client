@@ -5,6 +5,7 @@ import { TbEdit, TbLogout, TbUser } from "react-icons/tb";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase/firebase.config";
 import useAuth from "../hooks/useAuth";
+import PageTitle from "../components/PageTitle";
 
 const MyProfile = () => {
   const { user, setUser } = useAuth();
@@ -103,6 +104,7 @@ const MyProfile = () => {
 
   return (
     <div className="min-h-[85vh] bg-gradient-to-br from-[#D0E6FD] to-[#F1E4D1] flex justify-center items-start p-6">
+      <PageTitle title="Profile"></PageTitle>
       <div className="w-full max-w-4xl bg-white rounded-3xl shadow-xl overflow-hidden">
         {/* ================= HEADER ================= */}
         <div className="relative bg-gradient-to-r from-[#162660] to-[#243a8f] p-10 text-white">

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import useAuth from "../../../hooks/useAuth";
+import PageTitle from "../../../components/PageTitle";
 
 const ManageLoans = () => {
   const { user } = useAuth();
@@ -92,6 +93,7 @@ const ManageLoans = () => {
 
   return (
     <div className="p-4 sm:p-6">
+      <PageTitle title="Manage Loans"></PageTitle>
       <h1 className="text-2xl font-bold mb-4 text-[#162660]">Manage Loans</h1>
 
       <input

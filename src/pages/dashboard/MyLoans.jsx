@@ -5,6 +5,7 @@ import { TbFidgetSpinner } from "react-icons/tb";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import PageTitle from "../../components/PageTitle";
 
 const MyLoans = () => {
   const { user, loading } = useAuth();
@@ -135,6 +136,7 @@ const MyLoans = () => {
 
   return (
     <div className="p-4 md:p-6 min-h-[80vh]">
+      <PageTitle title="My Loans"></PageTitle>
       <h2 className="text-3xl font-bold mb-6 text-[#162660]">
         My Loan Applications
       </h2>

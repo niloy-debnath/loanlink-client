@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import { TbFidgetSpinner } from "react-icons/tb";
+import PageTitle from "../components/PageTitle";
 
 const AllLoansPage = () => {
   const [loans, setLoans] = useState([]);
@@ -28,6 +29,7 @@ const AllLoansPage = () => {
 
   return (
     <div className="min-h-[calc(100vh-64px)]  py-10 px-6 bg-gray-100">
+      <PageTitle title="All Loans"></PageTitle>
       <h1 className="text-3xl font-bold text-center text-[#162660] mb-8 mt-10">
         All Loans
       </h1>

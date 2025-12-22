@@ -26,6 +26,7 @@ import ManageLoans from "../pages/dashboard/manager/ManageLoans";
 import ApprovedApplicationsManager from "../pages/dashboard/manager/ApprovedApplicationsManager";
 import MyProfileManager from "../pages/dashboard/manager/MyProfileManager";
 import MyProfile from "../pages/MyProfile";
+import NotFound from "../pages/404/NotFound";
 
 const Router = createBrowserRouter([
   {
@@ -159,10 +160,18 @@ const Router = createBrowserRouter([
         ),
       },
       {
-        path: "profile",
-        element: <MyProfileManager></MyProfileManager>,
+        path: "manager-profile",
+        element: (
+          <ManagerRoute>
+            <MyProfileManager></MyProfileManager>
+          </ManagerRoute>
+        ),
       },
     ],
+  },
+  {
+    path: "*",
+    element: <NotFound />,
   },
 ]);
 

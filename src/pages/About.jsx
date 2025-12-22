@@ -1,8 +1,10 @@
 import { ShieldCheck, TrendingUp, Landmark, Users } from "lucide-react";
+import PageTitle from "../components/PageTitle";
 
 const About = () => {
   return (
     <section className="min-h-screen bg-gradient-to-br from-[#D0E6FD] via-white to-[#F1E4D1]">
+      <PageTitle title="About"></PageTitle>
       {/* Hero */}
       <div className="bg-[#162660] text-white py-24 text-center">
         <h1 className="text-4xl md:text-6xl font-bold mb-6">

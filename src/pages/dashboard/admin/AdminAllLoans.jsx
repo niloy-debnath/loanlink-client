@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
+import PageTitle from "../../../components/PageTitle";
 
 const AdminAllLoans = () => {
   const [loans, setLoans] = useState([]);
@@ -91,6 +92,7 @@ const AdminAllLoans = () => {
 
   return (
     <div className="p-4 md:p-6">
+      <PageTitle title="All Loans"></PageTitle>
       <h1 className="text-2xl md:text-3xl font-bold mb-5">All Loans</h1>
 
       {/* ---------- DESKTOP TABLE ---------- */}
